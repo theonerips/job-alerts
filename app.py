@@ -5,7 +5,7 @@ import os
 import telegram
 
 # Set your Telegram bot token and channel name here
-telegram_bot_token = "YOUR_BOT_TOKEN_HERE"
+telegram_bot_token = "5279527836:AAEmhztDGSbznzvuOVmezu5qHRy55haUvKs"
 channel_name = "@YOUR_CHANNEL_NAME_HERE"
 
 # Initialize the Telegram bot
