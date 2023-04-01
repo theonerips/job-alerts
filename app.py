@@ -1,44 +1,42 @@
 import requests
 from bs4 import BeautifulSoup
-import os
 import time
+import os
 import telegram
 
-# Set up Telegram bot
-bot = telegram.Bot(token=os.environ['TELEGRAM_TOKEN'])
-chat_id = os.environ['TELEGRAM_CHAT_ID']
+# Set your Telegram bot token and channel name here
+telegram_bot_token = "YOUR_BOT_TOKEN_HERE"
+channel_name = "@YOUR_CHANNEL_NAME_HERE"
 
-# Set up job posting platforms
-urls = [
-    'https://www.indeed.com/jobs?q=python&l=',
-    'https://www.linkedin.com/jobs/search/?keywords=python&location=',
-    'https://www.glassdoor.com/Job/jobs.htm?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword=python&sc.keyword=python&locT=&locId=&jobType='
-]
+# Initialize the Telegram bot
+bot = telegram.Bot(token=telegram_bot_token)
 
-# Define function to scrape job postings from a URL
-def scrape_jobs(url):
+# Create a function to scrape Digital Vision job postings
+def scrape_jobs():
+    # URL of the job postings page
+    url = "https://www.digitalvision.com/careers/"
+
+    # Send a GET request to the URL
     response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    job_listings = soup.find_all('div', class_='jobsearch-SerpJobCard')
-    jobs = []
-    for job in job_listings:
-        title = job.find('a', class_='jobtitle').text.strip()
-        company = job.find('span', class_='company').text.strip()
-        location = job.find('span', class_='location').text.strip()
-        link = 'https://www.indeed.com' + job.find('a')['href']
-        jobs.append({
-            'title': title,
-            'company': company,
-            'location': location,
-            'link': link
-        })
-    return jobs
 
-# Scrape job postings from each URL and send them to Telegram channel
-while True:
-    for url in urls:
-        jobs = scrape_jobs(url)
-        for job in jobs:
-            message = f"{job['title']} at {job['company']} in {job['location']}\n{job['link']}"
-            bot.send_message(chat_id=chat_id, text=message)
-    time.sleep(86400)  # Wait 24 hours before scraping again
+    # Parse the response using BeautifulSoup
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find all the job listings on the page
+    job_listings = soup.find_all('div', {'class': 'job-item'})
+
+    # Loop through each job listing and extract the job title, location, and link
+    for job_listing in job_listings:
+        job_title = job_listing.find('h3', {'class': 'job-title'}).text.strip()
+        job_location = job_listing.find('span', {'class': 'job-location'}).text.strip()
+        job_link = job_listing.find('a')['href']
+        job_message = f"New job posting on Digital Vision:\n\nTitle: {job_title}\nLocation: {job_location}\nLink: {job_link}"
+        
+        # Send the job message to the Telegram channel
+        bot.send_message(chat_id=channel_name, text=job_message)
+
+        # Add a delay of 1 second between each job notification to avoid spamming the channel
+        time.sleep(1)
+
+# Run the scrape_jobs() function
+scrape_jobs()
