@@ -6,7 +6,7 @@ import telegram
 
 # Set your Telegram bot token and channel name here
 telegram_bot_token = "5279527836:AAEmhztDGSbznzvuOVmezu5qHRy55haUvKs"
-channel_name = "@YOUR_CHANNEL_NAME_HERE"
+channel_name = "@jobnotifications012"
 
 # Initialize the Telegram bot
 bot = telegram.Bot(token=telegram_bot_token)
